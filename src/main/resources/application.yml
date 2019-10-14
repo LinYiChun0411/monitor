@@ -1,6 +1,11 @@
 spring:
     profiles: 
        active: local
+    datasource:
+      driver-class-name: com.mysql.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/ai?useSSL=false
+      username: ai_user
+      password: ai_user123
 server:
   port : 8080
   tomcat:

@@ -4,8 +4,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.Resource;
+
 import org.springframework.stereotype.Service;
 
+import com.aiinspector.dao.mapper.EmployeeMapper;
 import com.aiinspector.entity.Employee;
 import com.aiinspector.service.EmployeeService;
 
@@ -15,23 +18,23 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
-	final List<Employee> employees = Stream.of(Employee.builder().id(1).name("joey").age(18).build()
-			  ,Employee.builder().id(2).name("jeff").age(17).build())
-			  .collect(Collectors.toList());
+	
+	@Resource
+    private EmployeeMapper employeeMapper;
+	
+//	final List<Employee> employees = Stream.of(Employee.builder().id(1).name("joey").age(18).build()
+//			  ,Employee.builder().id(2).name("jeff").age(17).build())
+//			  .collect(Collectors.toList());
 	@Override
 	public Flux<List<Employee>> getAll() {
 		log.info("EmployeeServiceImpl.getAll");
-		  return Flux.just(employees);
+		  return Flux.just(employeeMapper.selectAll());
 	}
 	
 	@Override
 	public Mono<Employee> findById(String id) {
 		log.info("EmployeeServiceImpl.findById id:{}", id);
-		return Mono.just(
-	    		employees.stream().filter(
-    					e->e.getId().toString().equals(id)
-    					).findFirst().get()
-    		);
+		return Mono.just(employeeMapper.selectById(id));
 	}
 
 }
