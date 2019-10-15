@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Select;
 import com.aiinspector.entity.Employee;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
+@Mapper
 public interface EmployeeMapper extends BaseMapper<Employee>{
 	
 	@Select(value = "select id, name, age from ai.employee")

@@ -6,7 +6,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @EnableTransactionManagement
-@EnableScheduling
+
 @SpringBootApplication(scanBasePackages = "com.aiinspector")
 @MapperScan("com.aiinspector.dao.mapper")
 public class AIInspectorApplication {

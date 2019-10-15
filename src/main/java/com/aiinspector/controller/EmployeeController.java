@@ -1,7 +1,6 @@
 package com.aiinspector.controller;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,20 +26,17 @@ public class EmployeeController {
 	
 	@Autowired
 	private  YAMLConfig myConfig;
-
-	final AtomicInteger atomicInt = new AtomicInteger(0);
 	
 	@GetMapping("/{id}")
 	private Mono<Employee> getEmployeeById(@PathVariable String id) {
-		log.info("EmployeeController.getEmployeeById:{}", id);
-		log.info("Environment:{}", myConfig.getEnvironment());
+		log.info("EmployeeController.getEmployeeById:{}, Environment:{}", id, myConfig.getEnvironment());
 	    return employeeService.findById(id);
 	   
 	}
 
 	@GetMapping("/all")
 	private Flux<List<Employee>> getAllEmployees() {
-		log.info("EmployeeController.getAllEmployees");
+		log.info("EmployeeController.getAllEmployees, Environment:{}", myConfig.getEnvironment());
 	    return employeeService.getAll();
 	}
 }

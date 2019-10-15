@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RestTemplateConfig {
 
     /**
-     * using connection pool
+     * using pool
      * @return
      */
     @Bean

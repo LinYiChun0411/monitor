@@ -1,16 +1,55 @@
+server:
+  port : 8080
+name: AIInspector
+environment: local
+
+
+### Spring ###
 spring:
     profiles: 
        active: local
     datasource:
-      driver-class-name: com.mysql.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/ai?useSSL=false
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://localhost:3306/ai?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8
       username: ai_user
       password: ai_user123
-server:
-  port : 8080
-  tomcat:
-     accept-count: 50
-     max-threads: 50
-name: AIInspector
-environment: local
+      type: com.zaxxer.hikari.HikariDataSource
+      hikari:
+        maximumPoolSize: 100
+        minimumIdle: 3
+      #type: com.alibaba.druid.pool.DruidDataSource
+      #dbType: mysql
+      #initialSize: 5
+      #minIdle: 2
+      #maxActive: 50
+      #maxWait: 60000
+      #timeBetweenEvictionRunsMillis: 60000
+      #minEvictableIdleTimeMillis: 300000
+      #validationQuery: select 'x'
+      #testWhileIdle: true
+      #testOnBorrow: false
+      #testOnReturn: false
+      #poolPreparedStatements: true
+      #maxOpenPreparedStatements: 2
 
+### MyBatis ###
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/*.xml
+  typeAliasesPackage: com.aiinspector.entity
+  global-config:
+    id-type: auto
+    field-strategy: 2
+    db-column-underline: true
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    jdbc-type-for-null: 'null'
+    
+### slf4j ###
+logging:
+  level:
+    root: info
+    com:
+      aiinspector:
+        dao:
+          mapper: debug
