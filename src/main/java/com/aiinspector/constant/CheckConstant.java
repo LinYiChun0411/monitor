@@ -31,5 +31,10 @@ public class CheckConstant {
 	 * 赛事信息-启动-參數:secret
 	 */
 	public final static String SECRET = "secret";
+	
+	/**
+	 * 赛事信息-启动-參數:data
+	 */
+	public final static String DATA = "data";
 
 }

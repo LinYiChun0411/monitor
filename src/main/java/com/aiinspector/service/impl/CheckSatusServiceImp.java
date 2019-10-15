@@ -42,7 +42,7 @@ public class CheckSatusServiceImp implements CheckSatusService {
 		}
 	}
 
-	public void checkEpgs() throws Exception {
+	public void checkEpgs() {
 		if (checklogin(epgsHttp)) {
 			MultiValueMap<String, String> valueMap = new LinkedMultiValueMap<String, String>();
 			valueMap.add(CheckConstant.TOKEN, this.loginMap.get(CheckConstant.TOKEN));
@@ -54,17 +54,21 @@ public class CheckSatusServiceImp implements CheckSatusService {
 
 	}
 
-	private boolean checklogin(HttpUtil httpUtil) throws Exception {
+	public boolean checklogin(HttpUtil httpUtil) {
 		MultiValueMap<String, String> valueMap = new LinkedMultiValueMap<String, String>();
 		valueMap.add(CheckConstant.PROJECT, project);
 		valueMap.add(CheckConstant.SECRET, secret);
 		ResponseEntity responseEntity = httpUtil.postHttp(CheckConstant.CHECKEPGS_LOGIN_URL, valueMap);
-		if (responseEntity.getStatusCodeValue() == 200) {
-			ObjectMapper objectMapper = new ObjectMapper();
-			Map<String, Object> loginmap = objectMapper.readValue(responseEntity.getBody().toString(), Map.class);
-			this.loginMap.putAll((Map) loginmap.get("data"));
-			log.info(this.loginMap.toString());
-			return true;
+		try {
+			if (responseEntity.getStatusCodeValue() == 200) {
+				ObjectMapper objectMapper = new ObjectMapper();
+				Map<String, Object> loginmap = objectMapper.readValue(responseEntity.getBody().toString(), Map.class);
+				this.loginMap.putAll((Map) loginmap.get(CheckConstant.DATA));
+				log.info(this.loginMap.toString());
+				return true;
+			}
+		} catch (Exception e) {
+			throw new AIException(e.getMessage());
 		}
 		throw new AIException(responseEntity.getBody().toString());
 	}

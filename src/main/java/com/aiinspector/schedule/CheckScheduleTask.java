@@ -21,7 +21,7 @@ public class CheckScheduleTask {
 	}
 
 	@Scheduled(fixedRateString = "${inspector.scheduled}")
-	public void checkEpgs() throws Exception {
+	public void checkEpgs() {
 		checkSatusServiceImp.checkEpgs();
 	}
 
