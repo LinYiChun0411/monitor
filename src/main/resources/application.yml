@@ -53,3 +53,13 @@ logging:
       aiinspector:
         dao:
           mapper: debug
+
+### api check ###          
+inspector:
+  scheduled: 10000
+  check:
+    check-gamelist-server: http://pre.api.aisport.io
+    check-epgs-server: http://infoapi.zanstartv.com
+    login:
+      project: aiadmin
+      secret: ad6e6743
