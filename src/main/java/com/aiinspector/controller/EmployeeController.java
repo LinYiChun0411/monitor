@@ -15,6 +15,8 @@ import com.aiinspector.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 @RestController
 @RequestMapping("/employees")
@@ -37,7 +39,7 @@ public class EmployeeController {
 	@GetMapping("/all")
 	private Flux<List<Employee>> getAllEmployees() {
 		log.info("EmployeeController.getAllEmployees, Environment:{}", myConfig.getEnvironment());
-	    return employeeService.getAll();
+	    return employeeService.getAll().publishOn(Schedulers.parallel());
 	}
 }
 
