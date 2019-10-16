@@ -11,7 +11,9 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import com.aiinspector.constant.CheckConstant;
+import com.aiinspector.enums.HttpTypeEnum;
 import com.aiinspector.exception.AIException;
+import com.aiinspector.service.CheckSatusCommonService;
 import com.aiinspector.service.CheckSatusService;
 import com.aiinspector.util.HttpUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,50 +22,49 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class CheckSatusServiceImp implements CheckSatusService {
-	@Autowired
-	HttpUtil gameListHttp;
-
-	@Autowired
-	HttpUtil epgsHttp;
-	
+public class CheckSatusServiceImp implements CheckSatusService {	
 	@Autowired
 	HttpUtil normalHttp;
+	
+	@Value("${inspector.check.check-gamelist-server}")
+	private String gameListServerString;
+
+	@Value("${inspector.check.check-epgs-server}")
+	private String epgsServerString;
 
 	@Value("${inspector.check.login.project}")
 	private String project;
 
 	@Value("${inspector.check.login.secret}")
 	private String secret;
+	
+	@Autowired
+	CheckSatusCommonService checkSatusCommonServiceImp;
 
 	Map<String, String> loginMap = new HashMap<String, String>();
 
 	public void checkGameList() {
-		ResponseEntity responseEntity = gameListHttp.getHttp(CheckConstant.CHECKGAMELIST_URL);
-		if (responseEntity.getStatusCodeValue() != 200) {
-			throw new AIException(responseEntity.getBody().toString(),gameListHttp.getHttpConfig().getServer()+CheckConstant.CHECKGAMELIST_URL);
-		}
+		String url = gameListServerString+CheckConstant.CHECKGAMELIST_URL;
+		ResponseEntity responseEntity = checkSatusCommonServiceImp.checkCommonMethod(normalHttp, url, null, HttpTypeEnum.Get);
 	}
 
 	public void checkEpgs() {
+		String url = epgsServerString+CheckConstant.CHECKEPGS_URL;
 		MultiValueMap<String, String> valueMap = new LinkedMultiValueMap<String, String>();
 		valueMap.add(CheckConstant.TOKEN, this.loginMap.get(CheckConstant.TOKEN));
 		valueMap.add(CheckConstant.FILTER, CheckConstant.EPG);
-		ResponseEntity responseEntity = epgsHttp.postHttp(CheckConstant.CHECKEPGS_URL, valueMap);
-		if (responseEntity.getStatusCodeValue() != 200) {
-			throw new AIException(responseEntity.getBody().toString(),gameListHttp.getHttpConfig().getServer()+CheckConstant.CHECKEPGS_URL);
-		}
-
+		ResponseEntity responseEntity = checkSatusCommonServiceImp.checkCommonMethod(normalHttp, url, valueMap, HttpTypeEnum.Post);
 	}
 
 	public boolean checklogin() {
+		String url = epgsServerString+CheckConstant.CHECKEPGS_LOGIN_URL;
 		MultiValueMap<String, String> valueMap = new LinkedMultiValueMap<String, String>();
 		valueMap.add(CheckConstant.PROJECT, project);
 		valueMap.add(CheckConstant.SECRET, secret);
 		ResponseEntity responseEntity = null;
 		try {
-			responseEntity = epgsHttp.postHttp(CheckConstant.CHECKEPGS_LOGIN_URL, valueMap);
-			if (responseEntity.getStatusCodeValue() == 200) {
+			responseEntity = checkSatusCommonServiceImp.checkCommonMethod(normalHttp, url, valueMap, HttpTypeEnum.Post);
+			if (responseEntity.getStatusCodeValue() == 200) {				
 				ObjectMapper objectMapper = new ObjectMapper();
 				Map<String, Object> loginmap = objectMapper.readValue(responseEntity.getBody().toString(), Map.class);
 				this.loginMap.putAll((Map) loginmap.get(CheckConstant.DATA));
@@ -71,9 +72,9 @@ public class CheckSatusServiceImp implements CheckSatusService {
 				return true;
 			}
 		} catch (Exception e) {
-			throw new AIException(e.getMessage(),gameListHttp.getHttpConfig().getServer() + CheckConstant.CHECKEPGS_LOGIN_URL);
+			throw new AIException(e.getMessage(),url);
 		}
-		throw new AIException(responseEntity.getBody().toString(),gameListHttp.getHttpConfig().getServer() + CheckConstant.CHECKEPGS_LOGIN_URL);
+		return false;
 	}
 	
 	public void checkPlayer(String url) {
@@ -82,5 +83,6 @@ public class CheckSatusServiceImp implements CheckSatusService {
 			throw new AIException(responseEntity.getBody().toString(), url);
 		}		
 	}
+	
 
 }
