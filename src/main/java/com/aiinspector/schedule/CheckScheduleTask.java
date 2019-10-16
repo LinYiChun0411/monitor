@@ -22,7 +22,9 @@ public class CheckScheduleTask {
 
 	@Scheduled(fixedRateString = "${inspector.scheduled}")
 	public void checkEpgs() {
-		checkSatusServiceImp.checkEpgs();
+		if(checkSatusServiceImp.checklogin()) {
+			checkSatusServiceImp.checkEpgs();			
+		}
 	}
 
 }
