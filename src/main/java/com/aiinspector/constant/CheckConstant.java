@@ -36,5 +36,9 @@ public class CheckConstant {
 	 * 赛事信息-启动-參數:data
 	 */
 	public final static String DATA = "data";
+	
+	public final static String FILTER = "filter";
+	
+	public final static String EPG = "epg";
 
 }

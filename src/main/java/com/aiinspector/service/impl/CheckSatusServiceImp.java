@@ -26,6 +26,9 @@ public class CheckSatusServiceImp implements CheckSatusService {
 
 	@Autowired
 	HttpUtil epgsHttp;
+	
+	@Autowired
+	HttpUtil normalHttp;
 
 	@Value("${inspector.check.login.project}")
 	private String project;
@@ -38,16 +41,17 @@ public class CheckSatusServiceImp implements CheckSatusService {
 	public void checkGameList() {
 		ResponseEntity responseEntity = gameListHttp.getHttp(CheckConstant.CHECKGAMELIST_URL);
 		if (responseEntity.getStatusCodeValue() != 200) {
-			throw new AIException(responseEntity.getBody().toString());
+			throw new AIException(responseEntity.getBody().toString(),gameListHttp.getHttpConfig().getServer()+CheckConstant.CHECKGAMELIST_URL);
 		}
 	}
 
 	public void checkEpgs() {
 		MultiValueMap<String, String> valueMap = new LinkedMultiValueMap<String, String>();
 		valueMap.add(CheckConstant.TOKEN, this.loginMap.get(CheckConstant.TOKEN));
+		valueMap.add(CheckConstant.FILTER, CheckConstant.EPG);
 		ResponseEntity responseEntity = epgsHttp.postHttp(CheckConstant.CHECKEPGS_URL, valueMap);
 		if (responseEntity.getStatusCodeValue() != 200) {
-			throw new AIException(responseEntity.getBody().toString());
+			throw new AIException(responseEntity.getBody().toString(),gameListHttp.getHttpConfig().getServer()+CheckConstant.CHECKEPGS_URL);
 		}
 
 	}
@@ -67,9 +71,16 @@ public class CheckSatusServiceImp implements CheckSatusService {
 				return true;
 			}
 		} catch (Exception e) {
-			throw new AIException(e.getMessage());
+			throw new AIException(e.getMessage(),gameListHttp.getHttpConfig().getServer() + CheckConstant.CHECKEPGS_LOGIN_URL);
 		}
-		throw new AIException(responseEntity != null ? responseEntity.getBody().toString() : "ResponseEntity is null");
+		throw new AIException(responseEntity.getBody().toString(),gameListHttp.getHttpConfig().getServer() + CheckConstant.CHECKEPGS_LOGIN_URL);
+	}
+	
+	public void checkPlayer(String url) {
+		ResponseEntity responseEntity = normalHttp.getHttp(url);
+		if(responseEntity.getStatusCodeValue() != 200) {
+			throw new AIException(responseEntity.getBody().toString(), url);
+		}		
 	}
 
 }

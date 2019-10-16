@@ -9,6 +9,7 @@ import org.springframework.web.client.RestTemplate;
 
 import lombok.Data;
 
+@Data
 public class HttpUtil {
 	private HttpConfig httpConfig;	
 

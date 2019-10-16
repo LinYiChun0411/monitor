@@ -29,6 +29,8 @@ public class CheckHttpConfig {
 	public HttpUtil gameListHttp() {
 		HttpConfig httpConfig = new HttpConfig();
 		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		headers.add("user-agent", "CheckRuntime");
 		httpConfig.setServer(gameListServerString);
 		httpConfig.setHeaders(headers);
 		httpConfig.setRestTemplate(restTemplate);
@@ -42,6 +44,17 @@ public class CheckHttpConfig {
 		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 		headers.add("user-agent", "CheckRuntime");
 		httpConfig.setServer(epgsServerString);
+		httpConfig.setHeaders(headers);
+		httpConfig.setRestTemplate(restTemplate);
+		return new HttpUtil(httpConfig);
+	}
+	
+	@Bean
+	public HttpUtil normalHttp() {
+		HttpConfig httpConfig = new HttpConfig();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+		headers.add("user-agent", "CheckRuntime");
 		httpConfig.setHeaders(headers);
 		httpConfig.setRestTemplate(restTemplate);
 		return new HttpUtil(httpConfig);
