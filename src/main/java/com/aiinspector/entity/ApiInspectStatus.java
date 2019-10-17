@@ -4,8 +4,12 @@ import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Date;
 
+import org.jboss.logging.FormatWith;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.Version;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,7 +25,7 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-public class ApiInspectFailLog implements Serializable {
+public class ApiInspectStatus implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -32,43 +36,40 @@ public class ApiInspectFailLog implements Serializable {
     private BigInteger id;
 
     /**
-     * inspect URL
+     * success sum of count
      */
-    private String reqUrl;
+    private Integer successCount;
 
     /**
-          *  請求Class
+     *  fail sum of count
      */
-    private String reqClass;
+    private Integer failCount;
     
     /**
-         * 請求Method
+     * inspect url
      */
-    private String reqMethod;
+    private String inspectUrl;
 
-    /**
-         * 請求Argument
-     */
-    private String reqArgument;
-
-   /**
-    * 失敗訊息
-    */
-    private String failMsg;
     
     /**
-     *exception cause
+     * inspect date
      */
-    private String cause;
+    @DateTimeFormat(pattern = "yyyyMMdd")
+    private Date inspect_date;
 
     /**
-     *exception stackTrace
+     * last resp status
      */
-    private String stackTrace;
-        
+    private Integer lastRespStatus;
+
     /**
-     * update dateTime
+     * create dateTime
      */
     private Date updateDatetime;
-
+    /**
+     * lock version
+     */
+    @Version
+    private Integer version;
+	
 }

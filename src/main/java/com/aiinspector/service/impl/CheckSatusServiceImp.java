@@ -1,8 +1,6 @@
 package com.aiinspector.service.impl;
 
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +17,6 @@ import com.aiinspector.service.CheckSatusCommonService;
 import com.aiinspector.service.CheckSatusService;
 import com.aiinspector.util.HttpUtil;
 import com.aiinspector.util.ObjectMapperUtil;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 
 import lombok.extern.slf4j.Slf4j;
 
