@@ -1,10 +1,10 @@
 package com.aiinspector.service.impl;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
-import com.aiinspector.enums.HttpTypeEnum;
 import com.aiinspector.service.CheckSatusCommonService;
 import com.aiinspector.util.HttpUtil;
 
@@ -15,14 +15,14 @@ import lombok.extern.slf4j.Slf4j;
 public class CheckSatusCommonServiceImp implements CheckSatusCommonService{
 	
 	@Override
-	public ResponseEntity checkCommonMethod(HttpUtil httpUtil, String url, MultiValueMap<String, String> valueMap,HttpTypeEnum httpTypeEnum) {
+	public ResponseEntity checkCommonMethod(HttpUtil httpUtil, String url, MultiValueMap<String, String> valueMap,HttpMethod httpMethod) {
 		ResponseEntity responseEntity = null;
-		switch (httpTypeEnum) {
-		case Get: {
+		switch (httpMethod) {
+		case GET: {
 			responseEntity = httpUtil.getHttp(url);
 		}
 			break;
-		case Post: {
+		case POST: {
 			responseEntity = httpUtil.postHttp(url, valueMap);
 		}
 			break;
