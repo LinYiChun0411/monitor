@@ -37,8 +37,19 @@ public class CheckConstant {
 	 */
 	public final static String DATA = "data";
 	
+	/**
+	 * 赛事信息-參數:filter
+	 */
 	public final static String FILTER = "filter";
 	
+	/**
+	 * 赛事信息-filte值
+	 */
 	public final static String EPG = "epg";
+	
+	/**
+	 * 赛事信息-回應參數
+	 */
+	public final static String URL = "url";
 
 }
