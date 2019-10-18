@@ -57,11 +57,6 @@ public class ApiInspectFailLog implements Serializable {
     private String failMsg;
     
     /**
-     *exception cause
-     */
-    private String cause;
-
-    /**
      *exception stackTrace
      */
     private String stackTrace;

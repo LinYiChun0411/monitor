@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 
 
 @Data
-@Builder
+@Builder(toBuilder=true)
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)

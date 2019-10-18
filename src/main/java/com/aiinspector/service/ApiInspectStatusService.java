@@ -5,5 +5,4 @@ import com.baomidou.mybatisplus.extension.service.IService;
 
 
 public interface ApiInspectStatusService extends IService<ApiInspectStatus> {
-//	public Flux<List<ApiInspectFailLog>> getAll();
 }
