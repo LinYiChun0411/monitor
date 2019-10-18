@@ -4,9 +4,13 @@ name: AIInspector
 environment: local
 
 
+#Enable shutdown endpoint
+endpoints: 
+  shutdown: 
+    enabled: true
+    sensitive: false
+
 ### Spring ###
-
-
 spring:
     profiles: 
        active: local
@@ -34,7 +38,7 @@ spring:
       #poolPreparedStatements: true
       #maxOpenPreparedStatements: 2
       thymeleaf:
-        cache: true
+        cache: false
         check-template: true
         encoding: UTF-8
         prefix: classpath:/templates/

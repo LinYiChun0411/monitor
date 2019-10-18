@@ -16,16 +16,17 @@ public class ScheduleConfig {
 	@Bean
     public ThreadPoolTaskScheduler threadPoolTaskScheduler() {
         scheduler = new ThreadPoolTaskScheduler();
-        scheduler.setPoolSize(20);
+        scheduler.setPoolSize(10);
         scheduler.setThreadNamePrefix("Scheduler-");
-        scheduler.setAwaitTerminationSeconds(60);
+        scheduler.setWaitForTasksToCompleteOnShutdown(false);
+        
         return scheduler;
     }
     
     @PreDestroy
 	public void destroy() {
 		if(null != scheduler) {
-			scheduler.shutdown();
+			scheduler.destroy();
 		}
 	}
 }
