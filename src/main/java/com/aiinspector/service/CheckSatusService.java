@@ -1,5 +1,7 @@
 package com.aiinspector.service;
 
+import org.springframework.http.ResponseEntity;
+
 public interface CheckSatusService {
 	
 	/**
@@ -15,8 +17,15 @@ public interface CheckSatusService {
 
 	/**
 	 * 赛事信息
+	 * @return response body
 	 */
-	public void checkEpgs();
+	public ResponseEntity checkEpgs();
+	
+	/**
+	 * 赛事信息-各視頻
+	 * @param jsonString: json response
+	 */
+	public void checkEpgPlayers(String jsonString);
 	
 	
 

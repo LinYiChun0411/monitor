@@ -1,6 +1,7 @@
 package com.aiinspector.service.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,16 +46,15 @@ public class CheckSatusServiceImp implements CheckSatusService {
 
 	public void checkGameList() {
 		String url = gameListServerString+CheckConstant.CHECKGAMELIST_URL;
-		ResponseEntity responseEntity = checkSatusCommonServiceImp.checkCommonMethod(normalHttp, url, null, HttpMethod.GET);
+		ResponseEntity responseEntity = checkSatusCommonServiceImp.checkCommonMethod(normalHttp, url, null, HttpMethod.GET);		
 	}
 
-	public void checkEpgs() {
+	public ResponseEntity checkEpgs() {
 		String url = epgsServerString+CheckConstant.CHECKEPGS_URL;
 		MultiValueMap<String, String> valueMap = new LinkedMultiValueMap<String, String>();
 		valueMap.add(CheckConstant.TOKEN, this.loginMap.get(CheckConstant.TOKEN));
-		valueMap.add(CheckConstant.FILTER, CheckConstant.EPG);
-		ResponseEntity responseEntity = checkSatusCommonServiceImp.checkCommonMethod(normalHttp, url, valueMap, HttpMethod.POST);
-		
+		valueMap.add(CheckConstant.FILTER, CheckConstant.EPG);	
+		return checkSatusCommonServiceImp.checkCommonMethod(normalHttp, url, valueMap, HttpMethod.POST);
 	}
 
 	public boolean checklogin() {
@@ -77,11 +77,21 @@ public class CheckSatusServiceImp implements CheckSatusService {
 		return false;
 	}
 	
-	public void checkPlayer(String url) {
-		ResponseEntity responseEntity = normalHttp.getHttp(url);
-		if(responseEntity.getStatusCodeValue() != 200) {
-			throw new AIException(responseEntity.getBody().toString(), url);
-		}		
+	public void checkEpgPlayers(String jsonString) {
+		try {
+			Map respMap = ObjectMapperUtil.getObjectmapper().readValue(jsonString, Map.class);
+			List<Map> dataList = (List) respMap.get(CheckConstant.DATA);
+			dataList.stream().forEach(dataMap->{
+				List<Map> epgList = (List) dataMap.get(CheckConstant.EPG);
+				epgList.stream().forEach(liveMap->{
+					ResponseEntity responseEntity = checkSatusCommonServiceImp.checkCommonMethod(normalHttp,liveMap.get(CheckConstant.URL).toString(), null, HttpMethod.GET);
+				});
+			});			
+
+		} catch (Exception e) {
+			throw new AIException(e.getMessage(), jsonString);
+		}
+
 	}
 	
 
