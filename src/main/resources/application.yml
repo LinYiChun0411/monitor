@@ -5,6 +5,8 @@ environment: local
 
 
 ### Spring ###
+
+
 spring:
     profiles: 
        active: local
@@ -31,7 +33,14 @@ spring:
       #testOnReturn: false
       #poolPreparedStatements: true
       #maxOpenPreparedStatements: 2
-
+      thymeleaf:
+        cache: true
+        check-template: true
+        encoding: UTF-8
+        prefix: classpath:/templates/
+        suffix: .html
+        reactive:
+          max-chunk-size: 8192
 ### MyBatis ###
 mybatis-plus:
   mapper-locations: classpath*:/mapper/*.xml
@@ -49,10 +58,14 @@ mybatis-plus:
 logging:
   level:
     root: info
+    org:
+      springframework:
+        webf: debug
     com:
       aiinspector:
         dao:
           mapper: debug
+          
 
 ### api check ###          
 inspector:

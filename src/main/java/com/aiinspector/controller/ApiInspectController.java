@@ -1,21 +1,20 @@
 package com.aiinspector.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.thymeleaf.spring5.context.webflux.IReactiveDataDriverContextVariable;
+import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable;
 
 import com.aiinspector.config.YAMLConfig;
-import com.aiinspector.entity.ApiInspectFailLog;
 import com.aiinspector.service.ApiInspectFailLogService;
+import com.aiinspector.service.ApiInspectStatusService;
 
 import lombok.extern.slf4j.Slf4j;
-import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
-@RestController
+@Controller
 @RequestMapping("/apiinspect")
 @Slf4j
 public class ApiInspectController {
@@ -24,20 +23,24 @@ public class ApiInspectController {
 	private ApiInspectFailLogService apiInspectFailLogService;
 	
 	@Autowired
-	private  YAMLConfig myConfig;
+	private ApiInspectStatusService apiInspectStatusService;
 	
-//	@GetMapping("/{id}")
-//	private Mono<Employee> getEmployeeById(@PathVariable String id) {
-//		log.info("EmployeeController.getEmployeeById:{}, Environment:{}", id, myConfig.getEnvironment());
-//	    return employeeService.findById(id);
-//	   
-//	}
+	@Autowired
+	private  YAMLConfig myConfig;
 
-	@GetMapping("/all")
-	private Flux<List<ApiInspectFailLog>> getAllApiInspectFailLog() {
-		log.info("ApiInspectController.getAllApiInspectFailLog, Environment:{}", myConfig.getEnvironment());
-	    return apiInspectFailLogService.getAll().publishOn(Schedulers.parallel());
-	}
+	
+	@GetMapping("/today")
+    public String today(final Model model) {
+
+        IReactiveDataDriverContextVariable reactiveDataDrivenMode =
+                new ReactiveDataDriverContextVariable(apiInspectStatusService.getAllStatusToday());
+
+        model.addAttribute("status", reactiveDataDrivenMode);
+
+
+        return "index";
+    }
+
 }
 
 
