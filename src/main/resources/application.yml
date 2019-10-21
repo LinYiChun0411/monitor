@@ -73,6 +73,13 @@ logging:
 
 ### api check ###          
 inspector:
+  alertmail:
+    gmail:
+      host: pop.gmail.com
+      port: 995
+      username: lt.rd.mail@gmail.com
+      password: 9ol.0p;/
+      mailto: lt.rd.mail@gmail.com
   scheduled: 10000
   check:
     check-gamelist-server: http://pre.api.aisport.io
