@@ -1,10 +1,9 @@
 package com.aiinspector.aspect;
 
+
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -28,7 +27,6 @@ import com.aiinspector.entity.ApiInspectFailLog;
 import com.aiinspector.entity.ApiInspectStatus;
 import com.aiinspector.service.ApiInspectFailLogService;
 import com.aiinspector.service.ApiInspectStatusService;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -79,23 +77,63 @@ public class ApiInspectScheduleAspect {
 
     @AfterThrowing(pointcut = "inspect()", throwing = "ex")
     public void addAfterThrowingLogger(JoinPoint joinPoint, Exception ex) {
-    	Optional<ResponseEntity> respOpt = Optional.empty();
-        threadPool.execute(new InspectFailHandler(joinPoint, apiInspectFailLogService, apiInspectStatusService, Optional.of(ex), respOpt));
+        threadPool.execute(new InspectFailHandler(joinPoint, apiInspectFailLogService, apiInspectStatusService, Optional.of(ex)));
     	log.error("@AfterThrowing: joinPoint:{}, ex:{}", joinPoint, ex);
     }
 }
 
+@Slf4j
+abstract class InspectHandle implements Runnable{
+	final Predicate<Integer> isHttpStatusOK = status -> status == HttpStatus.SC_OK;
+	final Function<Integer, Integer> getCountBySuccess = status-> {return isHttpStatusOK.test(status)?1:0;};
+	final Function<Integer, Integer> getCountByFail = status-> {return isHttpStatusOK.test(status)?0:1;};
+	
+	protected void toSaveApiInspectStatus(final String url,final Date today,final int statusCode, ApiInspectStatusService apiInspectStatusService) {
+		ApiInspectStatus status = apiInspectStatusService.findByUrlWithDate( url, today);
+		if(null == status) {
+			apiInspectStatusService.save(ApiInspectStatus.builder()
+														   .inspectUrl(url)
+														   .inspect_date(today)
+														   .successCount(getCountBySuccess.apply(statusCode))
+														   .failCount(getCountByFail.apply(statusCode))
+														   .lastRespStatus(statusCode)
+														   .build());
+		}else {
+			status = status.toBuilder()
+										.successCount(status.getSuccessCount()+getCountBySuccess.apply(statusCode))
+										.failCount(status.getFailCount()+getCountByFail.apply(statusCode))
+										.lastRespStatus(statusCode)
+										.updateDatetime(new Date(ZonedDateTime.now(ZoneOffset.UTC).toInstant().toEpochMilli())).build();
+			apiInspectStatusService.updateById(status);
+			log.info("{}",status);
+		}
+	}
+	
+	
+	protected void toSaveApiInspectFailLog(final JoinPoint joinPoint ,final String url, String failMsg, String stackTrace, ApiInspectFailLogService apiInspectFailLogService) {
+		  String reqClass = joinPoint.getSignature().getDeclaringTypeName();
+          String reqMethod = joinPoint.getSignature().getName();
+          String reqArgument = org.springframework.util.StringUtils.arrayToCommaDelimitedString(joinPoint.getArgs());
+		  ApiInspectFailLog apiInspectFailLog = ApiInspectFailLog.builder()
+											     				   .reqClass(reqClass)
+											     				   .reqMethod(reqMethod)
+											     				   .reqArgument(reqArgument)
+											     				   .reqUrl(url)
+											     				   .failMsg(failMsg)
+											     				   .stackTrace(stackTrace)
+											     				   .build();
+			apiInspectFailLogService.save(apiInspectFailLog);
+	}
+}
 
 @Slf4j
 @AllArgsConstructor
-class InspectResultHandler implements Runnable{
+class InspectResultHandler extends InspectHandle{
 	final private JoinPoint joinPoint;
 	final private ApiInspectStatusService apiInspectStatusService;
 	final private ApiInspectFailLogService apiInspectFailLogService;
 	final private ResponseEntity resp;
-	final private Predicate<Integer> isHttpStatusOK = status -> status == HttpStatus.SC_OK;
-	final private Function<Integer, Integer> getCountBySuccess = status-> {return isHttpStatusOK.test(status)?1:0;};
-	final private Function<Integer, Integer> getCountByFail = status-> {return isHttpStatusOK.test(status)?0:1;};
+
 	@Override
 	public void run() {
 		try {
@@ -103,44 +141,11 @@ class InspectResultHandler implements Runnable{
 			String url  = (String) joinPoint.getArgs()[1];
 			long currentUTCTimeMillis = ZonedDateTime.now(ZoneOffset.UTC).toInstant().toEpochMilli();
 			Date today  = new java.sql.Date(currentUTCTimeMillis);
-			Map<String, Object> queryMap = new LinkedHashMap<>();
-			queryMap.put("inspect_url", url);
-			queryMap.put("inspect_date", today);
-			
-			ApiInspectStatus exist_status = apiInspectStatusService.getOne(new QueryWrapper<ApiInspectStatus>().allEq(queryMap));
-			
-			if(null == exist_status) {
-				apiInspectStatusService.save(ApiInspectStatus.builder()
-															   .inspectUrl(url)
-															   .inspect_date(today)
-															   .successCount(getCountBySuccess.apply(respStatusCode))
-															   .failCount(getCountByFail.apply(respStatusCode))
-															   .lastRespStatus(respStatusCode)
-															   .build());
-			}else {
-				exist_status = exist_status.toBuilder()
-											.successCount(exist_status.getSuccessCount()+getCountBySuccess.apply(respStatusCode))
-											.failCount(exist_status.getFailCount()+getCountByFail.apply(respStatusCode))
-											.lastRespStatus(respStatusCode)
-											.updateDatetime(new Date(currentUTCTimeMillis)).build();
-				apiInspectStatusService.updateById(exist_status);
-				log.info("{}",exist_status);
-			}
-			
+			//To write status response to ApiInspectStatus
+			toSaveApiInspectStatus(url, today, respStatusCode, apiInspectStatusService);
 			//To write failed response to ApiInspectFailLog
 			if(!isHttpStatusOK.test(respStatusCode)) {
-			    String reqClass = joinPoint.getSignature().getDeclaringTypeName();
-	            String reqMethod = joinPoint.getSignature().getName();
-	            String reqArgument = org.springframework.util.StringUtils.arrayToCommaDelimitedString(joinPoint.getArgs());
-				ApiInspectFailLog apiInspectFailLog = ApiInspectFailLog.builder()
-												     				   .reqClass(reqClass)
-												     				   .reqMethod(reqMethod)
-												     				   .reqArgument(reqArgument)
-												     				   .reqUrl(url)
-												     				   .failMsg(resp.getStatusCode().toString())
-												     				   .stackTrace(resp.getStatusCode().getReasonPhrase())
-												     				   .build();
-				apiInspectFailLogService.save(apiInspectFailLog);
+				toSaveApiInspectFailLog(joinPoint, url, resp.getStatusCode().toString(), resp.getStatusCode().getReasonPhrase(), apiInspectFailLogService);
 			}
 		} catch (Exception e) {
 			log.error("Class Name:{}, Exception:{}" + getClass().getName(), e);
@@ -150,29 +155,26 @@ class InspectResultHandler implements Runnable{
 
 @Slf4j
 @AllArgsConstructor
-class InspectFailHandler implements Runnable {
+class InspectFailHandler extends InspectHandle {
 	 final private JoinPoint joinPoint;
-     private ApiInspectFailLogService apiInspectFailLogService;
-	 private ApiInspectStatusService  apiInspectStatusService;
-	 private Optional<Exception> exOpt;
-	 private Optional<ResponseEntity> respOpt;
+	 final private ApiInspectFailLogService apiInspectFailLogService;
+	 final private ApiInspectStatusService  apiInspectStatusService;
+	 final private Optional<Exception> exOpt;
     @Override
     public void run() {
         try {
-            String reqClass = joinPoint.getSignature().getDeclaringTypeName();
-            String reqMethod = joinPoint.getSignature().getName();
-            String reqArgument = org.springframework.util.StringUtils.arrayToCommaDelimitedString(joinPoint.getArgs());
-            String reqUrl = (String) joinPoint.getArgs()[1];
-            String failMsg =  exOpt.map(e->e.getMessage().toString()).orElse("");
+        	long currentUTCTimeMillis = ZonedDateTime.now(ZoneOffset.UTC).toInstant().toEpochMilli();
+        	Date today  = new java.sql.Date(currentUTCTimeMillis);
+        	String url = (String) joinPoint.getArgs()[1];
+        	String failMsg =  exOpt.map(e->e.getMessage().toString()).orElse("");
             String stackTrace = exOpt.map(e->org.springframework.util.StringUtils.arrayToCommaDelimitedString(e.getStackTrace())) .orElse("");
-            ApiInspectFailLog apiInspectFailLog = ApiInspectFailLog.builder()
-									            				   .reqClass(reqClass)
-									            				   .reqMethod(reqMethod)
-									            				   .reqArgument(reqArgument)
-									            				   .reqUrl(reqUrl)
-									            				   .failMsg(failMsg)
-									            				   .stackTrace(stackTrace).build();
-            apiInspectFailLogService.save(apiInspectFailLog);
+        	 
+          //To write failed response to ApiInspectFailLog
+        	toSaveApiInspectFailLog(joinPoint, url, failMsg, stackTrace, apiInspectFailLogService);
+            
+           //To write failed response to ApiInspectStatus
+            toSaveApiInspectStatus(url, today, HttpStatus.SC_BAD_REQUEST, apiInspectStatusService);
+			
         } catch (Exception e) {
             log.error("Class Name:{}, Exception:{}" + getClass().getName(), e);
         }

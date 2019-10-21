@@ -1,10 +1,10 @@
 package com.aiinspector.service.impl;
 
-import java.time.Duration;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -26,7 +26,7 @@ public class ApiInspectStatusServiceImpl extends ServiceImpl<ApiInspectStatusMap
 	
 	@Resource
     private ApiInspectStatusMapper apiInspectStatusMapper;
-
+	
 	@Override
 	public Flux<ApiInspectStatus> getAllStatusToday() {
 		QueryWrapper<ApiInspectStatus> qryConditions = new QueryWrapper<>();
@@ -35,5 +35,12 @@ public class ApiInspectStatusServiceImpl extends ServiceImpl<ApiInspectStatusMap
 		return Flux.fromIterable(apiInspectStatusMapper.selectList(qryConditions));
 	}
 	
+	@Override
+	public ApiInspectStatus findByUrlWithDate(String url, Date today) {
+		Map<String, Object> queryMap = new LinkedHashMap<>();
+		queryMap.put("inspect_url", url);
+		queryMap.put("inspect_date", today);
+		return apiInspectStatusMapper.selectOne(new QueryWrapper<ApiInspectStatus>().allEq(queryMap));
+	}
 
 }

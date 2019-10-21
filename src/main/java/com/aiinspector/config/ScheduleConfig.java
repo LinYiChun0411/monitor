@@ -19,7 +19,6 @@ public class ScheduleConfig {
         scheduler.setPoolSize(10);
         scheduler.setThreadNamePrefix("Scheduler-");
         scheduler.setWaitForTasksToCompleteOnShutdown(false);
-        
         return scheduler;
     }
     
