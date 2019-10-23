@@ -5,8 +5,8 @@
       src/main/resources/application.yml 
 - 3 : 修改下列檢測參數(inspector:check:)
       src/main/resources/application.yml 
-- 3.1 修改domain name(check-gamelist-server:,check-epgs-server:)
-- 3.2 修改登入帳密(login:)      
+	* 3.1 修改domain name(check-gamelist-server:,check-epgs-server:)
+	* 3.2 修改登入帳密(login:)      
 - 4 : 修改mail參數-失敗才會寄送(inspector:alertmail:)
       src/main/resources/application.yml
 - 5 : 修改scheduled更新頻率參數-每任務結束後起算(inspector:scheduled:)
