@@ -46,7 +46,7 @@ public class CheckSatusServiceImp implements CheckSatusService {
 
 	public void checkGameList() {
 		String url = gameListServerString+CheckConstant.CHECKGAMELIST_URL;
-		ResponseEntity responseEntity = checkSatusCommonServiceImp.checkCommonMethod(normalHttp, url, null, HttpMethod.GET);		
+		checkSatusCommonServiceImp.checkCommonMethod(normalHttp, url, null, HttpMethod.GET);		
 	}
 
 	public ResponseEntity checkEpgs() {
@@ -68,11 +68,11 @@ public class CheckSatusServiceImp implements CheckSatusService {
 			if (responseEntity.getStatusCodeValue() == 200) {
 				Map<String, Object> loginmap = ObjectMapperUtil.getObjectmapper().readValue(responseEntity.getBody().toString(), Map.class);
 				this.loginMap.putAll((Map) loginmap.get(CheckConstant.DATA));
-				log.info(this.loginMap.toString());
 				return true;
 			}
 		} catch (Exception e) {
-			throw new AIException(e.getMessage(),url);
+			log.error("checklogin error:{} ,url:{}", e, url);
+			throw new AIException(e.getMessage(), url);
 		}
 		return false;
 	}
@@ -84,11 +84,12 @@ public class CheckSatusServiceImp implements CheckSatusService {
 			dataList.stream().forEach(dataMap->{
 				List<Map> epgList = (List) dataMap.get(CheckConstant.EPG);
 				epgList.stream().forEach(liveMap->{
-					ResponseEntity responseEntity = checkSatusCommonServiceImp.checkCommonMethod(normalHttp,liveMap.get(CheckConstant.URL).toString(), null, HttpMethod.GET);
+					checkSatusCommonServiceImp.checkCommonMethod(normalHttp,liveMap.get(CheckConstant.URL).toString(), null, HttpMethod.GET);
 				});
 			});			
 
 		} catch (Exception e) {
+			log.error("checkEpgPlayers error:{} ,url:{}", e, jsonString);
 			throw new AIException(e.getMessage(), jsonString);
 		}
 

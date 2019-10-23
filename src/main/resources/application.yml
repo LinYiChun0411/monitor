@@ -63,15 +63,16 @@ mybatis-plus:
     
 ### slf4j ###
 logging:
+  file: logs/inspector.log
   level:
     root: info
     org:
       springframework:
-        webf: debug
+        webf: info
     com:
       aiinspector:
         dao:
-          mapper: debug
+          mapper: info
           
 
 ### api check ###          
