@@ -34,10 +34,7 @@ public class ApiInspectController {
 
         IReactiveDataDriverContextVariable reactiveDataDrivenMode =
                 new ReactiveDataDriverContextVariable(apiInspectStatusService.getAllStatusToday());
-
         model.addAttribute("status", reactiveDataDrivenMode);
-
-
         return "index";
     }
 

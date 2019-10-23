@@ -28,4 +28,10 @@ public class ApiInspectFailLogServiceImpl extends ServiceImpl<ApiInspectFailLogM
 		  return Flux.just(apiInspectFailLogMapper.selectAll());
 	}
 
+	@Override
+	public void toSaveWithMap(ApiInspectFailLog apiInspectFailLog) {
+		FailLogMap.putIfAbsent(apiInspectFailLog.getReqUrl(), apiInspectFailLog);
+		apiInspectFailLogMapper.insert(apiInspectFailLog);
+	}
+
 }

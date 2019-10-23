@@ -41,7 +41,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ApiInspectScheduleAspect {
     @Autowired
-    @Qualifier("threadPool")
     ThreadPoolTaskExecutor threadPool;
 
     //running environment
@@ -55,6 +54,7 @@ public class ApiInspectScheduleAspect {
 	
 	@Autowired
 	private ApiInspectStatusService apiInspectStatusService;
+	
 	
     /**
      * load all resources what can be used in here
@@ -122,7 +122,7 @@ abstract class InspectHandle implements Runnable{
 											     				   .failMsg(failMsg)
 											     				   .stackTrace(stackTrace)
 											     				   .build();
-			apiInspectFailLogService.save(apiInspectFailLog);
+		apiInspectFailLogService.toSaveWithMap(apiInspectFailLog);
 	}
 }
 
@@ -137,7 +137,7 @@ class InspectResultHandler extends InspectHandle{
 	@Override
 	public void run() {
 		try {
-			final int respStatusCode = resp.getStatusCodeValue();
+			final int respStatusCode = 404;
 			String url  = (String) joinPoint.getArgs()[1];
 			long currentUTCTimeMillis = ZonedDateTime.now(ZoneOffset.UTC).toInstant().toEpochMilli();
 			Date today  = new java.sql.Date(currentUTCTimeMillis);

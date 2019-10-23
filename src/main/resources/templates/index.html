@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link data-th-href="@{/css/bootstrap.min.css}" rel="stylesheet">
     <link data-th-href="@{/css/main.css}" rel="stylesheet">
+    <script src="https://www.w3schools.com/lib/w3.js"></script>
 </head>
 <body>
 
@@ -13,19 +14,19 @@
 
     <div class="row">
         <div id="title">
-            <h1>Today Status of Inspect </h1>
+            <h1>URL检测结果(今天統計資料)</h1>
         </div>
-        <table id="TodayInspectStatus" class="table table-striped">
+        <table id="statusTable" class="table table-striped">
             <thead>
             <tr>
-                <th width="50%">url</th>
-                <th width="20%">success count</th>
-                <th width="20%">fail count</th>
-                <th>last resp status</th>
+                <th width="50%" onclick="w3.sortHTML('#statusTable', '.item', 'td:nth-child(3)')">URL</th>
+                <th width="15%">成功累计</th>
+                <th width="15%">失败累计</th>
+                <th>最后回应状态</th>
             </tr>
             </thead>
             <tbody>
-            <tr class="result" data-th-each="s : ${status}">
+            <tr class="item" data-th-each="s : ${status}">
                 <td>[[${s.inspectUrl}]]</td>
                 <td>[[${s.successCount}]]</td>
                 <td>[[${s.failCount}]]</td>
