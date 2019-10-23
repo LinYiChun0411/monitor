@@ -3,12 +3,15 @@ server:
 name: AIInspector
 environment: local
 
-
-#Enable shutdown endpoint
-endpoints: 
-  shutdown: 
-    enabled: true
-    sensitive: false
+### actuator ### 
+management:
+  endpoint:
+    shutdown:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'  
 
 ### Spring ###
 spring:
