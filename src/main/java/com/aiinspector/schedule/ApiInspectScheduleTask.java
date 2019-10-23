@@ -39,7 +39,7 @@ public class ApiInspectScheduleTask {
 	
     final String msgFormat = "RespStatus:%s URL:%s <br>";
     
-    @Scheduled(fixedRateString = "${inspector.scheduled}")
+    @Scheduled(fixedDelayString = "${inspector.scheduled}")
 	public void checkAPI() {
 		final Function<CheckSatusService, Optional<Void>> checkGmaiList = s->{
 			s.checkGameList();
