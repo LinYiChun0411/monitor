@@ -79,7 +79,7 @@ inspector:
       port: 995
       username: lt.rd.mail@gmail.com
       password: 9ol.0p;/
-      mailto: pjhsiao99@gmail.com,lt.rd.mail@gmail.com
+      mailto: lt.rd.mail@gmail.com
   scheduled: 10000
   check:
     check-gamelist-server: http://pre.api.aisport.io

@@ -1,11 +1,13 @@
 package com.aiinspector.schedule;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -35,31 +37,31 @@ public class ApiInspectScheduleTask {
     @Autowired
     ThreadPoolTaskExecutor threadPool;
 	
-    final String msgFormat = "failMsg:%s URL:%s <br>";
+    final String msgFormat = "RespStatus:%s URL:%s <br>";
     
     @Scheduled(fixedRateString = "${inspector.scheduled}")
 	public void checkAPI() {
-		final Function<CheckSatusService, Void> checkGmaiList = s->{
+		final Function<CheckSatusService, Optional<Void>> checkGmaiList = s->{
 			s.checkGameList();
-			return null;
+			return Optional.empty();
 		};
 		
-		final Function<CheckSatusService, Void> checkEpgs = s->{
+		final Function<CheckSatusService, Optional<Void>> checkEpgs = s->{
 			if(checkSatusServiceImp.checklogin()) {
 				ResponseEntity responseEntity = checkSatusServiceImp.checkEpgs();
-				if (responseEntity != null && responseEntity.getStatusCodeValue() == 200) {
+				if (responseEntity != null && responseEntity.getStatusCodeValue() == HttpStatus.SC_OK) {
 					checkSatusServiceImp.checkEpgPlayers(responseEntity.getBody().toString());
 				}						
 			}
-			return null;
+			return Optional.empty();
 		};
 		
 		Runnable r1 = ()->{checkGmaiList.apply(checkSatusServiceImp);};
 		Runnable r2 = ()->{checkEpgs.apply(checkSatusServiceImp);};
-		CompletableFuture<Void> cf = CompletableFuture.runAsync(r1, threadPool).thenRunAsync( r2, threadPool);
+		CompletableFuture<Void> cf = CompletableFuture.runAsync(r1, threadPool).runAsync(r2, threadPool);
 		
 		try {
-			cf.get(10, TimeUnit.SECONDS);
+			cf.get(60, TimeUnit.SECONDS);
 			StringBuffer msgContext = new StringBuffer("");
 			Set<String> keySet = apiInspectFailLogService.FailLogMap.keySet();
 			keySet.forEach(key->{
@@ -69,7 +71,7 @@ public class ApiInspectScheduleTask {
 				});
 			
 			if(!StringUtils.isEmpty(msgContext.toString())) {
-				mailAlertPushServiceImp.sendAlertMessage("API Inpected Err Report", msgContext.toString());
+				mailAlertPushServiceImp.sendAlertMessage("API Inpected Error Report", msgContext.toString());
 			}
 		} catch (Exception e) {
 			log.error("ApiInspectScheduleTask.checkAPI occurred Exception:{}",  e);

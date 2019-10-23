@@ -47,9 +47,9 @@ public class RestTemplateConfig {
       connectionManager.setMaxTotal(300);// pool size
       connectionManager.setDefaultMaxPerRoute(50);
       RequestConfig requestConfig = RequestConfig.custom()
-										          .setSocketTimeout(30 * 1000) //read timeout
+										          .setSocketTimeout(10 * 1000) //read timeout
 										          .setConnectTimeout(5 * 1000)//connection timeout
-										          .setConnectionRequestTimeout(50 * 1000)//connection request timeout
+										          .setConnectionRequestTimeout(10 * 1000)//connection request timeout
 										          .build();
       return HttpClientBuilder.create()
 								          .setDefaultRequestConfig(requestConfig)

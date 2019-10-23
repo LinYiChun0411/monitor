@@ -137,7 +137,7 @@ class InspectResultHandler extends InspectHandle{
 	@Override
 	public void run() {
 		try {
-			final int respStatusCode = 404;
+			final int respStatusCode = resp.getStatusCodeValue();
 			String url  = (String) joinPoint.getArgs()[1];
 			long currentUTCTimeMillis = ZonedDateTime.now(ZoneOffset.UTC).toInstant().toEpochMilli();
 			Date today  = new java.sql.Date(currentUTCTimeMillis);
