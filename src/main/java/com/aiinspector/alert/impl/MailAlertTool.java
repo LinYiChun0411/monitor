@@ -85,7 +85,7 @@ public class MailAlertTool extends AlertTool{
 		this.mailTo = mailTo;
 	}
 	
-	public void send(String mailTo) throws MessagingException{
+	public synchronized void send(String mailTo) throws MessagingException{
 		Multipart multipart = new MimeMultipart();
 		multipart.addBodyPart(this.textPart);
 		if(this.picturePart != null) multipart.addBodyPart(this.picturePart);
@@ -100,7 +100,7 @@ public class MailAlertTool extends AlertTool{
 	}
 
 	@Override
-	public void sendMessage(String title, String content) throws MessagingException{
+	public synchronized void sendMessage(String title, String content) throws MessagingException{
 		Multipart multipart = new MimeMultipart();
 		setSubject(title);
 		setText(content);
