@@ -10,4 +10,5 @@
 - 5 : 修改scheduled更新頻率參數-每任務結束後起算(inspector:scheduled:)
       src/main/resources/application.yml     
 - 6 : 執行 maven 打包指令產生的jar檔
-- 7 : 開啟瀏覽器輸入: http://localhost:8080/apiinspect/today 顯示狀態      
+- 7 : 瀏覽器輸入: http://localhost:8080/apiinspect/today 顯示狀態     
+- 8 : 瀏覽器輸入: http://localhost:8080/actuator/shutdown 關閉程式
