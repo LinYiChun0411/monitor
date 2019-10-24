@@ -32,12 +32,12 @@ public class MailAlertTool extends AlertTool{
 	private MimeBodyPart filePart = null;
 	private String mailTo = "";
 	
-	public MailAlertTool(String host, int protocol) throws NoSuchProviderException{
+	public MailAlertTool(String host, int protocol) {
 		this.setProperties(host, protocol);
 
 	}
 	
-	public void setProperties(String host, int protocol) throws NoSuchProviderException{
+	public void setProperties(String host, int protocol) {
 		props.put("mail.smtp.host", host);
 		props.put("mail.smtp.auth", "true");
 		props.put("mail.smtp.starttls.enable", "true");
