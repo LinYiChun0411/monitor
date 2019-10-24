@@ -86,9 +86,9 @@ public class CheckSatusServiceImp implements CheckSatusService {
 			throw new AIException(e.getMessage(), jsonString);
 		}
 		List<Map> dataList = (List) respMap.get(CheckConstant.DATA);
-		dataList.stream().forEach(dataMap -> {
+		dataList.parallelStream().forEach(dataMap -> {
 			List<Map> epgList = (List) dataMap.get(CheckConstant.EPG);
-			epgList.stream().forEach(liveMap -> {
+			epgList.parallelStream().forEach(liveMap -> {
 				checkSatusCommonServiceImp.checkCommonMethod(normalHttp, liveMap.get(CheckConstant.URL).toString(),	null, HttpMethod.GET);
 			});
 		});	

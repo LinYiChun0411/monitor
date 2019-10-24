@@ -26,20 +26,6 @@ spring:
       hikari:
         maximumPoolSize: 100
         minimumIdle: 3
-      #type: com.alibaba.druid.pool.DruidDataSource
-      #dbType: mysql
-      #initialSize: 5
-      #minIdle: 2
-      #maxActive: 50
-      #maxWait: 60000
-      #timeBetweenEvictionRunsMillis: 60000
-      #minEvictableIdleTimeMillis: 300000
-      #validationQuery: select 'x'
-      #testWhileIdle: true
-      #testOnBorrow: false
-      #testOnReturn: false
-      #poolPreparedStatements: true
-      #maxOpenPreparedStatements: 2
       thymeleaf:
         cache: false
         check-template: true
