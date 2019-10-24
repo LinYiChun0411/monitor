@@ -77,21 +77,21 @@ public class CheckSatusServiceImp implements CheckSatusService {
 		return false;
 	}
 	
-	public void checkEpgPlayers(String jsonString) {
+	public void checkEpgPlayers(String jsonString) {	
+		Map respMap = null;
 		try {
-			Map respMap = ObjectMapperUtil.getObjectmapper().readValue(jsonString, Map.class);
-			List<Map> dataList = (List) respMap.get(CheckConstant.DATA);
-			dataList.stream().forEach(dataMap->{
-				List<Map> epgList = (List) dataMap.get(CheckConstant.EPG);
-				epgList.stream().forEach(liveMap->{
-					checkSatusCommonServiceImp.checkCommonMethod(normalHttp,liveMap.get(CheckConstant.URL).toString(), null, HttpMethod.GET);
-				});
-			});			
-
+			respMap = ObjectMapperUtil.getObjectmapper().readValue(jsonString, Map.class);
 		} catch (Exception e) {
 			log.error("checkEpgPlayers error:{} ,url:{}", e, jsonString);
 			throw new AIException(e.getMessage(), jsonString);
 		}
+		List<Map> dataList = (List) respMap.get(CheckConstant.DATA);
+		dataList.stream().forEach(dataMap -> {
+			List<Map> epgList = (List) dataMap.get(CheckConstant.EPG);
+			epgList.stream().forEach(liveMap -> {
+				checkSatusCommonServiceImp.checkCommonMethod(normalHttp, liveMap.get(CheckConstant.URL).toString(),	null, HttpMethod.GET);
+			});
+		});	
 
 	}
 	
