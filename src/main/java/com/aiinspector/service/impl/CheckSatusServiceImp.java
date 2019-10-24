@@ -62,10 +62,9 @@ public class CheckSatusServiceImp implements CheckSatusService {
 		MultiValueMap<String, String> valueMap = new LinkedMultiValueMap<String, String>();
 		valueMap.add(CheckConstant.PROJECT, project);
 		valueMap.add(CheckConstant.SECRET, secret);
-		ResponseEntity responseEntity = null;
+		ResponseEntity responseEntity = checkSatusCommonServiceImp.checkCommonMethod(normalHttp, url, valueMap, HttpMethod.POST);
 		try {
-			responseEntity = checkSatusCommonServiceImp.checkCommonMethod(normalHttp, url, valueMap, HttpMethod.POST);
-			if (responseEntity.getStatusCodeValue() == 200) {
+			if (responseEntity != null && responseEntity.getStatusCodeValue() == 200) {
 				Map<String, Object> loginmap = ObjectMapperUtil.getObjectmapper().readValue(responseEntity.getBody().toString(), Map.class);
 				this.loginMap.putAll((Map) loginmap.get(CheckConstant.DATA));
 				return true;
