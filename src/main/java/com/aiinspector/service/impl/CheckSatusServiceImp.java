@@ -62,10 +62,9 @@ public class CheckSatusServiceImp implements CheckSatusService {
 		MultiValueMap<String, String> valueMap = new LinkedMultiValueMap<String, String>();
 		valueMap.add(CheckConstant.PROJECT, project);
 		valueMap.add(CheckConstant.SECRET, secret);
-		ResponseEntity responseEntity = null;
+		ResponseEntity responseEntity = checkSatusCommonServiceImp.checkCommonMethod(normalHttp, url, valueMap, HttpMethod.POST);
 		try {
-			responseEntity = checkSatusCommonServiceImp.checkCommonMethod(normalHttp, url, valueMap, HttpMethod.POST);
-			if (responseEntity.getStatusCodeValue() == 200) {
+			if (responseEntity != null && responseEntity.getStatusCodeValue() == 200) {
 				Map<String, Object> loginmap = ObjectMapperUtil.getObjectmapper().readValue(responseEntity.getBody().toString(), Map.class);
 				this.loginMap.putAll((Map) loginmap.get(CheckConstant.DATA));
 				return true;
@@ -77,21 +76,21 @@ public class CheckSatusServiceImp implements CheckSatusService {
 		return false;
 	}
 	
-	public void checkEpgPlayers(String jsonString) {
+	public void checkEpgPlayers(String jsonString) {	
+		Map respMap = null;
 		try {
-			Map respMap = ObjectMapperUtil.getObjectmapper().readValue(jsonString, Map.class);
-			List<Map> dataList = (List) respMap.get(CheckConstant.DATA);
-			dataList.stream().forEach(dataMap->{
-				List<Map> epgList = (List) dataMap.get(CheckConstant.EPG);
-				epgList.stream().forEach(liveMap->{
-					checkSatusCommonServiceImp.checkCommonMethod(normalHttp,liveMap.get(CheckConstant.URL).toString(), null, HttpMethod.GET);
-				});
-			});			
-
+			respMap = ObjectMapperUtil.getObjectmapper().readValue(jsonString, Map.class);
 		} catch (Exception e) {
 			log.error("checkEpgPlayers error:{} ,url:{}", e, jsonString);
 			throw new AIException(e.getMessage(), jsonString);
 		}
+		List<Map> dataList = (List) respMap.get(CheckConstant.DATA);
+		dataList.stream().forEach(dataMap -> {
+			List<Map> epgList = (List) dataMap.get(CheckConstant.EPG);
+			epgList.stream().forEach(liveMap -> {
+				checkSatusCommonServiceImp.checkCommonMethod(normalHttp, liveMap.get(CheckConstant.URL).toString(),	null, HttpMethod.GET);
+			});
+		});	
 
 	}
 	
