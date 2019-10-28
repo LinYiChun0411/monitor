@@ -1,3 +1,6 @@
+### 程式運行版本
+- 1 : 資料庫 ： MySQL 5.6 以上
+- 2 : JDK : 1.8 以上
 ### 佈署方式
 - 1 : 建立資料庫 
       執行 src/main/resources/sql/ai_database.sql     
