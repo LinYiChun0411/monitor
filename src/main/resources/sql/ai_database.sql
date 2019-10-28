@@ -1,4 +1,7 @@
-﻿CREATE DATABASE `ai` /*!40100 DEFAULT CHARACTER SET utf8 */ /*!80016 DEFAULT ENCRYPTION='N' */;
+create DATABASE `ai` DEFAULT CHARACTER SET utf8;
+
+use ai;
+
 CREATE TABLE `api_inspect_fail_log` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id(increment)',
   `req_url` varchar(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL COMMENT 'inspect URL',
@@ -10,6 +13,7 @@ CREATE TABLE `api_inspect_fail_log` (
   `update_datetime` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create DateTime',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1678 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=DYNAMIC COMMENT='api inspect fail log';
+
 CREATE TABLE `api_inspect_status` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT COMMENT 'id(increment)',
   `success_count` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'inspect URL success sum of count',
@@ -20,5 +24,5 @@ CREATE TABLE `api_inspect_status` (
   `update_datetime` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'create DateTime',
   `version` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE KEY `Unique` (`inspect_url`,`inspect_date`) /*!80000 INVISIBLE */
+  UNIQUE KEY `Unique` (`inspect_url`,`inspect_date`)
 ) ENGINE=InnoDB AUTO_INCREMENT=109 DEFAULT CHARSET=utf8 COLLATE=utf8_bin ROW_FORMAT=DYNAMIC COMMENT='api inspect status';
